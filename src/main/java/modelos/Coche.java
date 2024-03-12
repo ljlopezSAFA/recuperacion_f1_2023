@@ -12,4 +12,10 @@ public class Coche {
     private Double aceleracion;
     private Double tiempoMedioParadaBoxes;
     private Double probabilidadAveria;
+
+    public Double puntuacionCoche(){
+        return this.velocidadPunta + this.aceleracion - this.tiempoMedioParadaBoxes - this.probabilidadAveria;
+    }
+
+
 }

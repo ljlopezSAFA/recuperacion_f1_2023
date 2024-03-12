@@ -22,7 +22,11 @@ public class UtilidadesF1 {
      * @return
      */
     public static List<Piloto> getPilotosPorMarcaEscuderia(List<Piloto> pilotos, Marca marca){
-        return new ArrayList<>();
+
+        return pilotos
+                .stream()
+                .filter(p-> p.getEscuderia().getMarca().equals(marca))
+                .toList();
     }
 
 
@@ -33,7 +37,9 @@ public class UtilidadesF1 {
      * @return
      */
     public static Map<Escuderia, List<Piloto>>  pilotosPorEscuderia(List<Piloto> pilotos){
-        return new HashMap<>();
+        return pilotos
+                .stream()
+                .collect(Collectors.groupingBy(Piloto::getEscuderia));
     }
 
 
@@ -47,8 +53,21 @@ public class UtilidadesF1 {
      */
     public static List<Coche> topMejoresCoches(List<Coche> coches, Double minimoPuntuacionRequerida){
 
-        return new ArrayList<>();
+        Comparator<Coche> comparador = Comparator.comparing(Coche::puntuacionCoche);
+
+        List<Coche> cochesFiltro = coches
+                .stream()
+                .filter(c-> minimoPuntuacionRequerida <= c.puntuacionCoche())
+                .sorted(comparador.reversed())
+                .toList();
+
+//        cochesFiltro.sort(comparador.reversed());
+
+
+        return cochesFiltro;
     }
+
+
 
 
     /**
@@ -64,7 +83,7 @@ public class UtilidadesF1 {
      * @return
      */
     public static Double porcentajeVictoriaPiloto(Piloto piloto){
-        return null;
+        return piloto.getEscuderia().getCoche().puntuacionCoche() + piloto.getEscuderia().getPuntosRanking() + piloto.getPuntosRanking();
     }
 
 
@@ -74,7 +93,16 @@ public class UtilidadesF1 {
      *
      */
      public static Piloto getMejorPiloto(Piloto piloto1, Piloto piloto2){
-        return null;
+
+//         if(porcentajeVictoriaPiloto(piloto1) > porcentajeVictoriaPiloto(piloto2)){
+//             return piloto1;
+//         }else{
+//             return piloto2;
+//         }
+
+         //CONDICIONAL TRIPLE
+         // CONDICION  "?" VALOR SI SE CUMPLE ":" VALOR SI NO SE CUMPLE ";"
+        return porcentajeVictoriaPiloto(piloto1) > porcentajeVictoriaPiloto(piloto2)? piloto1: piloto2 ;
     }
 
 
@@ -89,7 +117,28 @@ public class UtilidadesF1 {
      * @return
      */
     public static Map<Integer,Escuderia> getRankigPorEscuderias(List<RankingEscuderias> rankingEscuderias, Integer temporada){
-        return new HashMap<>();
+
+        Map<Integer, Escuderia> mapaFinal = new HashMap<>();
+
+        for(RankingEscuderias r: rankingEscuderias){
+            if(r.getTemporada().equals(temporada)){
+                for(Escuderia e: r.getEscuderias()){
+                    mapaFinal.put(e.getPosicionEnRanking(), e);
+                }
+            }
+        }
+
+        return mapaFinal;
+
+
+//        return rankingEscuderias
+//                .stream()
+//                .filter(e-> e.getTemporada().equals(temporada))
+//                .findFirst()
+//                .get().getEscuderias()
+//                    .stream()
+//                    .collect(Collectors.toMap(Escuderia::getPosicionEnRanking, e->e));
+
     }
 
 
@@ -103,7 +152,26 @@ public class UtilidadesF1 {
      */
     public static Map<Piloto, Double> totalPuntuacion(List<Carrera> carreras){
 
-       return new HashMap<>();
+        Map<Piloto, Double> puntuaciones = new HashMap<>();
+
+        for(Carrera c: carreras){
+
+            for(Integer posicionEnCarrera : c.getPosiciones().keySet()){
+
+                Piloto pilotoEnPosicion = c.getPosiciones().get(posicionEnCarrera);
+                Double puntosPiloto = c.getPuntosPorPosicion().get(posicionEnCarrera);
+
+                if(puntuaciones.containsKey(pilotoEnPosicion)){
+                    puntuaciones.put(pilotoEnPosicion, puntuaciones.get(pilotoEnPosicion) +puntosPiloto );
+                }else{
+                    puntuaciones.put(pilotoEnPosicion, puntosPiloto);
+                }
+
+            }
+        }
+
+
+       return puntuaciones;
     }
 
 }
